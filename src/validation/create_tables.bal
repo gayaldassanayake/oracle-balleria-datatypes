@@ -10,7 +10,6 @@ function initializeTableNumeric(jdbc:Client jdbcClient)returns sql:Error?{
         "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
         "COL_NUMBER  NUMBER, " +
         "COL_FLOAT  FLOAT, " +
-        "COL_LONG LONG, "+
         "COL_BINARY_FLOAT BINARY_FLOAT, "+
         "COL_BINARY_DOUBLE BINARY_DOUBLE, "+
         "PRIMARY KEY(PK) "+
@@ -57,6 +56,16 @@ function initializeTableLOB(jdbc:Client jdbcClient)returns sql:Error?{
         "COL_NCLOB  NCLOB, " +
         "COL_BLOB BLOB, " +
         "COL_BFILE  BFILE, " +
+        "PRIMARY KEY(PK) "+
+        ")"
+        );
+}
+
+function initializeTableLong(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('LONGTYPE'); END;");
+    result = check jdbcClient->execute("CREATE TABLE LONGTYPE(" +
+        "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
+        "COL_LONG LONG, "+
         "PRIMARY KEY(PK) "+
         ")"
         );
@@ -199,6 +208,9 @@ function initializeAllTables(jdbc:Client jdbcClient){
     err = initializeTableDateTime(jdbcClient);
     printTableCreationResult("DateTime", err);
         
+    err = initializeTableLong(jdbcClient);
+    printTableCreationResult("LONGTYPE", err);
+
     err = initializeTableLOB(jdbcClient);
     printTableCreationResult("LOB", err);
 
