@@ -4,9 +4,12 @@ import ballerina/java.jdbc;
 
 public function main() {
     sql:Error| jdbc:Client jdbcClient = initializeClient();
-    if(jdbcClient is jdbc:Client){
-        selectFromAllTables(jdbcClient);
+    if(jdbcClient is jdbc:Client){  
+        // error? e = initializeTableAnyTypes(jdbcClient);
+        insertToAllTables(jdbcClient);
+        // selectFromAllTables(jdbcClient);
         // initializeAllTables(jdbcClient);
+
     } else{
         io:println("Error creating jdbc client");
     }

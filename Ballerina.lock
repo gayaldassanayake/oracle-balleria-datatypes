@@ -43,6 +43,11 @@ org_name = "ballerina"
 name = "java.jdbc"
 version = "0.5.1"
 
+[[imports."gayal/validation:0.1.0"]]
+org_name = "ballerina"
+name = "time"
+version = "1.0.2"
+
 [[imports."ballerina/config:1.0.1"]]
 org_name = "ballerina"
 name = "stringutils"

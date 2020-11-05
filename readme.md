@@ -11,3 +11,9 @@ ballerina build -a
 ``` bash
 target/bin/validation.jar
 ```
+
+- or instead to directly execute,
+
+``` bash
+ballerina build -a && ballerina run target/bin/validation.jar
+```

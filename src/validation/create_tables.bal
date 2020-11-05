@@ -46,15 +46,51 @@ function initializeTableDateTime(jdbc:Client jdbcClient)returns sql:Error?{
         );
 }
 
-function initializeTableLOB(jdbc:Client jdbcClient)returns sql:Error?{
-    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('LOB'); END;");
-    result = check jdbcClient->execute("CREATE TABLE LOB(" +
+function initializeTableBLOB(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('BLOB'); END;");
+    result = check jdbcClient->execute("CREATE TABLE BLOB(" +
+        "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
+        "COL_BLOB BLOB, " +
+        "PRIMARY KEY(PK) "+
+        ")"
+        );
+}
+
+function initializeTableRAW(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('RAWT'); END;");
+    result = check jdbcClient->execute("CREATE TABLE RAWT(" +
         "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
         "COL_RAW  RAW(2000), " +
         "COL_LONG_RAW  LONG RAW, " +
+        "PRIMARY KEY(PK) "+
+        ")"
+        );
+}
+
+function initializeTableCLOB(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('CLOB'); END;");
+    result = check jdbcClient->execute("CREATE TABLE CLOB(" +
+        "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
         "COL_CLOB  CLOB, " +
+        "PRIMARY KEY(PK) "+
+        ")"
+        );
+}
+
+function initializeTableNCLOB(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('NCLOB'); END;");
+    result = check jdbcClient->execute("CREATE TABLE NCLOB(" +
+        "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
         "COL_NCLOB  NCLOB, " +
-        "COL_BLOB BLOB, " +
+        "PRIMARY KEY(PK) "+
+        ")"
+        );
+}
+
+function initializeTableBFILE(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('BFILE'); END;");
+    result = check jdbcClient->execute("CREATE TABLE BFILE(" +
+        "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
         "COL_BFILE  BFILE, " +
         "PRIMARY KEY(PK) "+
         ")"
@@ -152,12 +188,14 @@ function initializeTableAnyTypes(jdbc:Client jdbcClient)returns sql:Error?{
     sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('ANYTYPES'); END;");
     result = check jdbcClient->execute("CREATE TABLE ANYTYPES(" +
         "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
-        "COL_ANYTYPE1 ANYTYPE, " +
-        "COL_ANYTYPE2 ANYTYPE, " +
-        "COL_ANYDATA1 ANYTYPE, " +
-        "COL_ANYDATA2 ANYTYPE, " +
-        "COL_ANYDATASET1 ANYTYPE, " +
-        "COL_ANYDATASET2 ANYTYPE, " +
+        "COL_ANYTYPE1 SYS.ANYTYPE, " +
+        "COL_ANYTYPE2 SYS.ANYTYPE, " +
+        "COL_ANYTYPE3 SYS.ANYTYPE, " +
+        "COL_ANYDATA1 SYS.ANYDATA, " +
+        "COL_ANYDATA2 SYS.ANYDATA, " +
+        "COL_ANYDATA3 SYS.ANYDATA, " +
+        "COL_ANYDATASET1 SYS.ANYDATASET, " +
+        "COL_ANYDATASET2 SYS.ANYDATASET, " +
         "PRIMARY KEY(PK) "+
         ")"
         );
@@ -211,8 +249,20 @@ function initializeAllTables(jdbc:Client jdbcClient){
     err = initializeTableLong(jdbcClient);
     printTableCreationResult("LONGTYPE", err);
 
-    err = initializeTableLOB(jdbcClient);
-    printTableCreationResult("LOB", err);
+    err = initializeTableCLOB(jdbcClient);
+    printTableCreationResult("CLOB", err);
+
+    err = initializeTableNCLOB(jdbcClient);
+    printTableCreationResult("NCLOB", err);
+
+    err = initializeTableRAW(jdbcClient);
+    printTableCreationResult("RAW", err);
+
+    err = initializeTableBFILE(jdbcClient);
+    printTableCreationResult("BFILE", err);
+
+    err = initializeTableBLOB(jdbcClient);
+    printTableCreationResult("BLOB", err);
 
     err = initializeTableANSITypes(jdbcClient);
     printTableCreationResult("ANSITYPES", err);
