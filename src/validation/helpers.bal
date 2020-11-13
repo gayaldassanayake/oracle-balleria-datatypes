@@ -8,6 +8,10 @@ function initializeClient() returns sql:Error| jdbc:Client {
     return jdbcClient;
 }
 
+function closeClient(jdbc:Client jdbcClient) returns sql:Error?{
+    check jdbcClient.close();
+}
+
 function process(io:ReadableCharacterChannel sc) returns @untainted string|error {
 
     string greetingText = check sc.read(50000) ;
@@ -35,7 +39,6 @@ function readFileAsByte() returns @untainted error|byte[] {
     io:ReadableByteChannel readableFieldResult =
                                  check io:openReadableFile("src/validation/resources/bigfile.txt");
     var result = readableFieldResult.read(50000);
-    // var result = process(sourceChannel);
 
     if (result is error) {
         io:println("error occurred while processing chars ", result);
@@ -83,4 +86,3 @@ function stripArray(byte[] arr, int len) returns byte[] {
 
     return strippedArray;
 }
-

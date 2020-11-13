@@ -27,6 +27,7 @@ type DatetimeRecord record {|
     string col_interval_day_to_second;
 |};
 
+//removed
 type LOBRecord record {|
     int pk;
     string col_long_row;
@@ -40,8 +41,8 @@ type LOBRecord record {|
 // update with userdefined
 type RowIdRecord record{|
     int pk;
-    string rowid;
-    string urowid;
+    int[] col_rowid;
+    // string urowid;
 |};
 
 
@@ -80,7 +81,7 @@ type Col_object record {|
 type userdefinedRecord record {|
     int pk;
     Col_object col_object;
-    Col_object[] col_varray;
+    // Col_object[] col_varray;
 |};
 
 type blobRecord record {|
@@ -109,3 +110,45 @@ type bfileRecord record {|
     byte[] col_bfile;
 |};
 
+type anyRecord record {|
+    int pk;
+    string col_anydata1;
+    string col_anydata2;
+    string col_anydata3;
+    string type_name2;
+    string type_name3;
+|};
+
+type xmlRecord record {|
+    int pk;
+    string col_xmltype;
+    string col_httpuritype;
+    string col_dburitype;
+    string col_xdburitype;
+    string col_uri_type;
+|};
+
+type varrayRecord record {|
+    // int pk;
+    record {} COL_VVCARR;
+    // int[] col_numarr;
+|};
+
+type REFRecord record {|
+    string attr1;
+    string ref;
+|};
+
+type location record {|
+    int location_id ;
+    string street_address;   
+    string postal_code;      
+    string city;             
+    string state_province;   
+|};
+
+type country record {|
+    string country_id;
+    string country_name;
+    location[] locations;     
+|};

@@ -17,6 +17,27 @@ function numericSelect(jdbc:Client jdbcClient){
     } 
 }
 
+function refSelect(jdbc:Client jdbcClient){
+    stream<record{} | error> resultStream = jdbcClient->query("select attr1, REF(n) as ref from REFTABLE n", REFRecord);
+    stream<REFRecord, sql:Error> refStream = <stream<REFRecord, sql:Error>> resultStream;
+
+    error? e = refStream.forEach(function(REFRecord refr) {
+        io:println(refr.ref);
+    });
+    if (e is error) {
+        io:println(e);
+    } 
+
+    // stream<record{} , error> resultStream = jdbcClient->query("select REF(n) as ref from REFTABLE n");
+
+    // error? e = resultStream.forEach(function(record{} r) {
+    //     io:println(r);
+    // });
+    // if (e is error) {
+    //     io:println(e);
+    // } 
+}
+
 function characterSelect(jdbc:Client jdbcClient){
     stream<record{} | error> resultStream = jdbcClient->query("select * from CHARACTER", CharacterRecord);
     stream<CharacterRecord, sql:Error> characterStream = <stream<CharacterRecord, sql:Error>> resultStream;
@@ -36,7 +57,7 @@ function datetimeSelect(jdbc:Client jdbcClient){
     stream<record{} | error> resultStream = jdbcClient->query("select * from DATETIME", DatetimeRecord);
     stream<DatetimeRecord, sql:Error> datetimeStream = <stream<DatetimeRecord, sql:Error>> resultStream;
     string timeFormat = "yyyy-MM-dd HH:mm:ss.SSZ";
-//   time:Time|time:Error time = ;
+
     error? e = datetimeStream.forEach(function(DatetimeRecord datetime) {
         io:println(datetime.col_date);
         io:println(datetime.col_timestamp_1);
@@ -50,8 +71,9 @@ function datetimeSelect(jdbc:Client jdbcClient){
     } 
 }
 
+// depricated
 function LOBSelect(jdbc:Client jdbcClient){
-    stream<record{} | error> resultStream = jdbcClient->query("select * from DATETIME", LOBRecord);
+    stream<record{} | error> resultStream = jdbcClient->query("select * from LOB", LOBRecord);
     stream<LOBRecord, sql:Error> lobStream = <stream<LOBRecord, sql:Error>> resultStream;
     error? e = lobStream.forEach(function(LOBRecord lob) {
         io:println(lob.col_long_row);
@@ -67,10 +89,23 @@ function LOBSelect(jdbc:Client jdbcClient){
 
 // update with user defined types later
 function rowIdSelect(jdbc:Client jdbcClient){
+    // stream<record {} | error> resultStream = jdbcClient->query("Select pk, ROWID from NUMERIC", RowIdRecord);
+    // stream<RowIdRecord, sql:Error> rowIdStream = <stream<RowIdRecord, sql:Error>> resultStream;
+
+    // error? e = rowIdStream.forEach(function (RowIdRecord row){
+    //     io:println(row.rowid);
+
+    // });
+
+    // if(e is error){
+    //     io:println(e);
+    // }
     stream<record{}, error> resultStream = jdbcClient->query("Select pk, ROWID from NUMERIC");
 
     error? e = resultStream.forEach(function (record {} result){
         io:println(result);
+        // int[] rowid = <int[]>result["ROWID"];
+        // io:print(rowid);
 
     });
 
@@ -127,18 +162,17 @@ function userdefinedSelect(jdbc:Client jdbcClient){
     // error? e = resultStream.forEach(function (record {} result){
     //     // io:println(result);
     // }); 
-    // stream<record{} | error> resultStream = jdbcClient->query("select * from USERDEFINED", userdefinedRecord);
-    // stream<userdefinedRecord, sql:Error> userdefinedStream = <stream<userdefinedRecord, sql:Error>> resultStream;
-    // error? e = userdefinedStream.forEach(function(userdefinedRecord usrdef) {
-    //     io:println(usrdef.col_object.attr1);
-    //     // io:println(usrdef.col_varray);
-    //     // usrdef.col_varray = forEach(function(Col_object obj){
+    stream<record{} | error> resultStream = jdbcClient->query("select * from USERDEFINED", userdefinedRecord);
+    stream<userdefinedRecord, sql:Error> userdefinedStream = <stream<userdefinedRecord, sql:Error>> resultStream;
+    error? e = userdefinedStream.forEach(function(userdefinedRecord usrdef) {
+        io:println(usrdef.col_object.attr1);
+        // io:println(usrdef.col_varray);
+        // usrdef.col_varray = forEach(function(Col_object obj){
 
-        // })
-    // });
-    // if (e is error) {
-    //     io:println(e);
-    // } 
+    });
+    if (e is error) {
+        io:println(e);
+    } 
 }
 
 function blobSelect(jdbc:Client jdbcClient){
@@ -208,16 +242,35 @@ function bfileSelect(jdbc:Client jdbcClient){
 
 function anytypeSelect(jdbc:Client jdbcClient){
 
-    stream<record{} , error> resultStream = jdbcClient->query(
+    stream<record{} | error> resultStream = jdbcClient->query(
         "SELECT PK, "+
-       "SYS.ANYDATA.getTypeName(COL_ANYDATA1) AS type_name1 , SYS.ANYDATA.getTypeName(COL_ANYDATA2) AS type_name2, "+
+       "(CASE SYS.ANYDATA.getTypeName(COL_ANYDATA1)"+
+          "WHEN 'SYS.VARCHAR2' THEN SYS.ANYDATA.accessVarchar2(COL_ANYDATA1)"+
+          "WHEN 'SYS.NUMBER'   THEN TO_CHAR(SYS.ANYDATA.accessNumber(COL_ANYDATA1))"+
+          "WHEN 'SYS.DATE'     THEN TO_CHAR(SYS.ANYDATA.accessDate(COL_ANYDATA1), 'DD-MON-YYYY')"+
+        "END) AS COL_ANYDATA1 , "+
+        "(CASE SYS.ANYDATA.getTypeName(COL_ANYDATA2)"+
+          "WHEN 'SYS.VARCHAR2' THEN SYS.ANYDATA.accessVarchar2(COL_ANYDATA2)"+
+          "WHEN 'SYS.NUMBER'   THEN TO_CHAR(SYS.ANYDATA.accessNumber(COL_ANYDATA2))"+
+          "WHEN 'SYS.DATE'     THEN TO_CHAR(SYS.ANYDATA.accessDate(COL_ANYDATA2), 'DD-MON-YYYY')"+
+        "END) AS COL_ANYDATA2 , "+
+        "(CASE SYS.ANYDATA.getTypeName(COL_ANYDATA3)"+
+          "WHEN 'SYS.VARCHAR2' THEN SYS.ANYDATA.accessVarchar2(COL_ANYDATA3)"+
+          "WHEN 'SYS.NUMBER'   THEN TO_CHAR(SYS.ANYDATA.accessNumber(COL_ANYDATA3))"+
+          "WHEN 'SYS.DATE'     THEN TO_CHAR(SYS.ANYDATA.accessDate(COL_ANYDATA3), 'DD-MON-YYYY')"+
+        "END) AS COL_ANYDATA3 , "+
+       "SYS.ANYDATA.getTypeName(COL_ANYDATA2) AS type_name2, "+
        "SYS.ANYDATA.getTypeName(COL_ANYDATA3) AS type_name3 "+
-        "FROM ANYTYPES ORDER BY PK");
+        "FROM ANYTYPES ORDER BY PK", anyRecord);
 
-    
+    stream<anyRecord, sql:Error> anyStream = <stream<anyRecord, sql:Error>> resultStream;
 
-    error? e = resultStream.forEach(function (record {} result){
-        io:println(result);
+    error? e = anyStream.forEach(function (anyRecord anyr){
+        io:println(anyr.col_anydata1);
+        io:println(anyr.col_anydata2);
+        io:println(anyr.col_anydata3);
+        io:println(anyr.type_name2);
+        io:println(anyr.type_name3);
     });
 
      if (e is error) {
@@ -225,26 +278,101 @@ function anytypeSelect(jdbc:Client jdbcClient){
     }
 }
 
-function selectFromAllTables(jdbc:Client jdbcClient){
-    // numericSelect(jdbcClient);
-    // characterSelect(jdbcClient);
-    // datetimeSelect(jdbcClient);
-    // rowIdSelect(jdbcClient);
-    // ansiSelect(jdbcClient);
-    // sqldsSelect(jdbcClient);
-    // // userdefinedSelect(jdbcClient);
-    // blobSelect(jdbcClient);
-    // clobSelect(jdbcClient);
-    // nclobSelect(jdbcClient);
-    // rawSelect(jdbcClient);
-    // bfileSelect(jdbcClient);
-    anytypeSelect(jdbcClient);
+function xmlSelect(jdbc:Client jdbcClient){
+
+    stream<record{} | error> resultStream = jdbcClient->query("SELECT "+
+        " t.COL_XMLTYPE.getClobval() AS COL_XMLTYPE, "+
+        " t.COL_HTTPURITYPE.geturl() as COL_HTTPURITYPE, "+
+        " t.COL_DBURITYPE.geturl() as COL_DBURITYPE, "+
+        " t.COL_XDBURITYPE.geturl() as COL_XDBURITYPE, "+
+        " t.COL_URI_TYPE.geturl() as COL_URI_TYPE "+
+        "from XMLTYPES t", xmlRecord);
+    stream<xmlRecord, sql:Error> xmlStream = <stream<xmlRecord, sql:Error>> resultStream;
+    error? e = xmlStream.forEach(function(xmlRecord xmlr) {
+        io:println(xmlr.col_xmltype);
+        io:println(xmlr.col_httpuritype);
+        io:println(xmlr.col_xdburitype);
+        io:println(xmlr.col_dburitype);
+        io:println(xmlr.col_uri_type);
+    });
+    if (e is error) {
+        io:println(e);
+    } 
 }
 
-//lob
-//long
-//rowid
-//userdefined
-//anytype
-//xml
-//geometry
+function varrayselect(jdbc:Client jdbcClient){
+
+    stream<record{} , error> resultStream = jdbcClient->query("select COL_VVCARR from varraytable");
+    error? e = resultStream.forEach(function(record{} varr) {
+        string[] x = <string[]>varr["COL_VVCARR"];
+        io:println(x);
+    });
+    if (e is error) {
+        io:println(e);
+    } 
+
+    // stream<record{} | error> resultStream = jdbcClient->query("select COL_VVCARR from varraytable;", varrayRecord);
+    // stream<varrayRecord, sql:Error> varrStream = <stream<varrayRecord, sql:Error>> resultStream;
+    // error? e = varrStream.forEach(function(varrayRecord varr) {
+    //     io:println(varr);
+    // });
+    // if (e is error) {
+    //     io:println(e);
+    // } 
+}
+
+
+function geomertySelect(jdbc:Client jdbcClient){
+
+    stream<record{} , error> resultStream = jdbcClient->query("SELECT t.col_sdo_geometry FROM GEOMETRYTYPES t");
+    io:println(resultStream);
+    // stream<xmlRecord, sql:Error> xmlStream = <stream<xmlRecord, sql:Error>> resultStream;
+    error? e = resultStream.forEach(function(record{} rec) {
+        io:println(rec);
+    });
+    if (e is error) {
+        io:println(e);
+    } 
+    io:println("Hello");
+}
+
+
+function nestedTableSelect(jdbc:Client jdbcClient){
+
+    stream<record{} , error> resultStream = jdbcClient->query("SELECT * FROM NESTEDTABLE");
+    io:println(resultStream);
+    // stream<xmlRecord, sql:Error> xmlStream = <stream<xmlRecord, sql:Error>> resultStream;
+    error? e = resultStream.forEach(function(record{} rec) {
+        io:println(rec["COUNTRIES"]);
+        anydata[] countries = <anydata[]> rec["COUNTRIES"];
+        countries.forEach(function(anydata count){
+            io:println(count);
+        });
+    });
+    if (e is error) {
+        io:println(e);
+    } 
+}
+
+# The `selectFromAllTables` function that calls all the data selection functions
+# + jdbcClient - type jdbc:Client - jdbc client instance
+function selectFromAllTables(jdbc:Client jdbcClient){
+    numericSelect(jdbcClient);
+    characterSelect(jdbcClient);
+    datetimeSelect(jdbcClient);
+    rowIdSelect(jdbcClient);
+    ansiSelect(jdbcClient);
+    sqldsSelect(jdbcClient);
+    // userdefinedSelect(jdbcClient);
+    blobSelect(jdbcClient);
+    clobSelect(jdbcClient);
+    nclobSelect(jdbcClient);
+    rawSelect(jdbcClient);
+    bfileSelect(jdbcClient);
+    anytypeSelect(jdbcClient);
+    xmlSelect(jdbcClient);
+    geomertySelect(jdbcClient);
+    varrayselect(jdbcClient);
+    refSelect(jdbcClient);
+    nestedTableSelect(jdbcClient);
+}

@@ -2,7 +2,7 @@ import ballerina/sql;
 import ballerina/io;
 import ballerina/java.jdbc;
 
-const string OID = "19A57209ECB73F91E03400400B40BBE3";
+const string OID = "19A57209ECB73F91E03400400B40BB23";
 
 function initializeTableNumeric(jdbc:Client jdbcClient)returns sql:Error?{
     sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('NUMERIC'); END;");
@@ -33,6 +33,8 @@ function initializeTableCharacter(jdbc:Client jdbcClient)returns sql:Error?{
 
 function initializeTableDateTime(jdbc:Client jdbcClient)returns sql:Error?{
     sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('DATETIME'); END;");
+    result = check jdbcClient->execute("ALTER SESSION SET NLS_DATE_FORMAT='DD-MON-RR HH:MI:SS AM'");
+    result = check jdbcClient->execute("alter session set NLS_TIMESTAMP_TZ_FORMAT = 'DD-MON-RR HH:MI:SS AM TZR'");
     result = check jdbcClient->execute("CREATE TABLE DATETIME(" +
         "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
         "COL_DATE  DATE, " +
@@ -148,6 +150,28 @@ function initializeTableSQLDSTypes(jdbc:Client jdbcClient)returns sql:Error?{
         );
 }
 
+
+function initializeTableVarray(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("DROP TYPE VCARRTYPE FORCE");
+    result = check jdbcClient->execute("DROP TYPE NUMARRTYPE FORCE");
+
+    result = check jdbcClient->execute(
+        " CREATE OR REPLACE TYPE VCARRTYPE AS VARRAY(6) OF VARCHAR(100);"
+        );
+
+    result = check jdbcClient->execute(
+        " CREATE OR REPLACE TYPE NUMARRTYPE AS VARRAY(6) OF NUMBER;"
+        );
+
+    result = check jdbcClient->execute("CREATE TABLE VARRAYTABLE(" +
+        "PK NUMBER GENERATED ALWAYS AS IDENTITY, "+
+        "COL_VVCARR VCARRTYPE, " +
+        "COL_NUMARR NUMARRTYPE, " +
+        "PRIMARY KEY(PK) "+
+        ")"
+        );
+}
+
 function initializeTableUserDefined(jdbc:Client jdbcClient)returns sql:Error?{
     sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('USERDEFINED'); END;");
     result = check jdbcClient->execute("DROP TYPE OBJECT_TYPE FORCE");
@@ -209,6 +233,7 @@ function initializeTableXMLTypes(jdbc:Client jdbcClient)returns sql:Error?{
         "COL_HTTPURITYPE HTTPURITYPE, " +
         "COL_DBURITYPE DBURITYPE, " +
         "COL_XDBURITYPE XDBURITYPE, " +
+        "COL_URI_TYPE URITYPE, "+
         "PRIMARY KEY(PK) "+
         ")"
         );
@@ -226,6 +251,37 @@ function initializeTableGeometryTypes(jdbc:Client jdbcClient)returns sql:Error?{
         );
 }
 
+function initializeREFTable(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('REFTABLE'); END;");
+
+    result = check jdbcClient->execute("DROP TYPE REF_TYPE FORCE");
+
+    result = check jdbcClient->execute(
+        "CREATE OR REPLACE TYPE REF_TYPE OID '"+ OID +"' AS OBJECT(" +
+        "ATTR1 VARCHAR(20), "+
+        "ATTR2 VARCHAR(20)   "+
+        ") "
+    );
+    result = check jdbcClient->execute("CREATE TABLE REFTABLE OF REF_TYPE");
+}
+
+
+function initializeNestedTable(jdbc:Client jdbcClient)returns sql:Error?{
+    sql:ExecutionResult result = check jdbcClient->execute("BEGIN DROPTABLE('NESTEDTABLE'); END;");
+
+    result = check jdbcClient->execute(
+        "CREATE TABLE NESTEDTABLE ("+
+            "region_id     NUMBER,"+
+            "region_name   VARCHAR2(25),"+
+            "countries     nt_country_typ) "+
+            "NESTED TABLE countries STORE AS nt_countries_tab"+
+            " (NESTED TABLE locations STORE AS nt_locations_tab)"
+        );
+}
+
+# The `printTableCreationResult` function that prints out the result of the table creation
+# + tablename - type string - name of the table
+# + err - type error? - error during execution
 function printTableCreationResult(string tablename, sql:Error? err){
     if (err is sql:Error) {
             io:println(tablename, " table initialization failed! ", err);
@@ -234,6 +290,8 @@ function printTableCreationResult(string tablename, sql:Error? err){
         }
 }
 
+# The `initializeAllTables` function that calls all the table creation functions
+# + jdbcClient - type jdbc:Client - jdbc client instance
 function initializeAllTables(jdbc:Client jdbcClient){
     sql:Error? err;
 
@@ -281,4 +339,10 @@ function initializeAllTables(jdbc:Client jdbcClient){
 
     err = initializeTableGeometryTypes(jdbcClient);
     printTableCreationResult("GEOMATRYTYPES",err);
+
+    err = initializeREFTable(jdbcClient);
+    printTableCreationResult("REF",err);
+
+    err = initializeNestedTable(jdbcClient);
+    printTableCreationResult("NESTEDTABLE",err);
 }
