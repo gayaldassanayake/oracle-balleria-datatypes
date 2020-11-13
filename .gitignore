@@ -1,3 +1,2 @@
 target
-src/validation/resources/*
-!src/validation/resources/.gitkeep 
+src/validation/resources/bigfile.txt
