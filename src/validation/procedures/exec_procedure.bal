@@ -65,6 +65,6 @@ function executeAllProcedures(jdbc:Client jdbcClient) returns error?{
     err = executeNumericProcedure(jdbcClient);
     printExecuteProcedureResult("NUMERIC", err);
 
-    // err = executeCharacterProcedure(jdbcClient);
-    // printExecuteProcedureResult("CHARACTER", err);
+    err = executeCharacterProcedure(jdbcClient);
+    printExecuteProcedureResult("CHARACTER", err);
 }
