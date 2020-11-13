@@ -1,2 +1,3 @@
 target
-./src/resources/bigfile.txt
+./src/resources/*
+!./src/resources/.gitkeep 
