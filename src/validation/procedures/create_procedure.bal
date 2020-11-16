@@ -26,11 +26,42 @@ function createDateTimeProcedure(jdbc:Client jdbcClient) returns error?{
     sql:ExecutionResult result = check jdbcClient->execute(query);
 }
 
-function createLOBProcedure(jdbc:Client jdbcClient) returns error?{
-    string[] variables = ["RAW", "CLOB", "NCLOB", "BLOB", "BFILE",
-                 "LONG", "LONG RAW"];
+function createBLOBProcedure(jdbc:Client jdbcClient) returns error?{
+    string[] variables = ["BLOB"];
 
-    string query = createProcedureQuery("LOBPROC", variables);
+    string query = createProcedureQuery("BLOBPROC", variables);
+
+    sql:ExecutionResult result = check jdbcClient->execute(query);
+}
+
+function createCLOBProcedure(jdbc:Client jdbcClient) returns error?{
+    string[] variables = ["CLOB"];
+
+    string query = createProcedureQuery("CLOBPROC", variables);
+
+    sql:ExecutionResult result = check jdbcClient->execute(query);
+}
+
+function createNCLOBProcedure(jdbc:Client jdbcClient) returns error?{
+    string[] variables = ["NCLOB"];
+
+    string query = createProcedureQuery("NCLOBPROC", variables);
+
+    sql:ExecutionResult result = check jdbcClient->execute(query);
+}
+
+function createLongProcedure(jdbc:Client jdbcClient) returns error?{
+    string[] variables = ["LONG"];
+
+    string query = createProcedureQuery("LONGPROC", variables);
+
+    sql:ExecutionResult result = check jdbcClient->execute(query);
+}
+
+function createRawProcedure(jdbc:Client jdbcClient) returns error?{
+    string[] variables = ["RAW", "LONG RAW"];
+
+    string query = createProcedureQuery("LONGPROC", variables);
 
     sql:ExecutionResult result = check jdbcClient->execute(query);
 }
@@ -53,17 +84,26 @@ function printCreateProcedureResult(string procedurename, error? err){
 function createAllProcedures(jdbc:Client jdbcClient) returns error?{
     error? err;
 
-    err = createNumericProcedure(jdbcClient);
-    printCreateProcedureResult("NUMERIC", err);
+    // err = createNumericProcedure(jdbcClient);
+    // printCreateProcedureResult("NUMERIC", err);
 
-    err = createCharacterProcedure(jdbcClient);
-    printCreateProcedureResult("CHARACTER", err);
+    // err = createCharacterProcedure(jdbcClient);
+    // printCreateProcedureResult("CHARACTER", err);
 
-    err = createDateTimeProcedure(jdbcClient);
-    printCreateProcedureResult("DATETIME", err);
+    // err = createDateTimeProcedure(jdbcClient);
+    // printCreateProcedureResult("DATETIME", err);
 
-    err = createLOBProcedure(jdbcClient);
-    printCreateProcedureResult("LOB", err);
+    // err = createBLOBProcedure(jdbcClient);
+    // printCreateProcedureResult("BLOB", err);
+
+    // err = createCLOBProcedure(jdbcClient);
+    // printCreateProcedureResult("CLOB", err);
+
+    // err = createNCLOBProcedure(jdbcClient);
+    // printCreateProcedureResult("NCLOB", err);
+
+    err = createLongProcedure(jdbcClient);
+    printCreateProcedureResult("LONG", err);
 }
 
 

@@ -37,3 +37,66 @@ sql:CharOutParameter CHAR_OUT = new();
 sql:NCharValue NCHAR_IN = new("Hello there text");
 sql:InOutParameter NCHAR_INOUT= new("In out text");
 sql:NCharOutParameter NCHAR_OUT = new();
+
+// -------------DATETIME----------------------------
+sql:DateTimeValue DATETIME_TEMP = new("1000-01-01 09:33:45.00");
+sql:TimestampValue TIMESTAMP_TEMP = new("1000-01-01 09:33:45.00");
+sql:TimestampValue TIMESTAMP_TEMPTZ = new("1000-01-01 09:33:45.00");
+sql:TimestampValue TIMESTAMP_TEMPTZL = new("1000-01-16 09:33:45.00");
+
+sql:TimestampValue DATETIME_IN = new("2002-01-16 09:33:45.00");
+sql:InOutParameter DATETIME_INOUT= new(DATETIME_TEMP);
+sql:TimestampOutParameter DATETIME_OUT = new();
+
+sql:TimestampValue TIMESTAMP_IN = new("2002-01-16 09:33:45.00");
+sql:InOutParameter TIMESTAMP_INOUT= new(TIMESTAMP_TEMP);
+sql:TimestampOutParameter TIMESTAMP_OUT = new();
+
+sql:TimestampValue TIMESTAMPTZ_IN = new("2002-01-16 09:33:45.00");
+sql:InOutParameter TIMESTAMPTZ_INOUT= new(TIMESTAMP_TEMPTZ);
+sql:TimestampOutParameter TIMESTAMPTZ_OUT = new();
+
+sql:TimestampValue TIMESTAMPTZL_IN = new("2002-01-16 09:33:45.00");
+sql:InOutParameter TIMESTAMPTZL_INOUT= new(TIMESTAMP_TEMPTZL);
+sql:TimestampOutParameter TIMESTAMPTZL_OUT = new();
+
+sql:DateValue INTERVALY2M_IN = new("24-05");
+sql:InOutParameter INTERVALY2M_INOUT = new("01-00");
+sql:DateOutParameter INTERVALY2M_OUT = new();
+
+sql:TimeValue INTERVALD2S_IN = new("4 5:12:10.22");
+sql:InOutParameter INTERVALD2S_INOUT = new("4 5:12:10.22");
+sql:TimeOutParameter INTERVALD2S_OUT = new();
+
+// -------------BLOB----------------------------
+byte[] blob=check readFileAsByte();
+byte[] mediumBlob = stripArray(blob, 1000);
+byte[] smallBlob = stripArray(blob, 500);
+
+sql:BlobValue BLOB_IN = new(mediumBlob);
+sql:InOutParameter BLOB_INOUT = new(smallBlob);
+sql:BlobOutParameter BLOB_OUT = new();
+
+// -------------CLOB----------------------------
+string clob =check readFileAsCharacter();
+string mediumClob = check 'string:fromBytes(stripArray(clob.toBytes(), 2000));
+
+sql:ClobValue CLOB_IN = new(mediumClob);  
+sql:InOutParameter CLOB_INOUT = new(mediumClob);
+sql:ClobOutParameter CLOB_OUT = new();
+
+// -------------NCLOB----------------------------
+
+sql:ClobValue NCLOB_IN = CLOB_IN; 
+sql:InOutParameter NCLOB_INOUT = CLOB_INOUT;
+sql:ClobOutParameter NCLOB_OUT = new();
+
+// -------------LONG----------------------------
+
+sql:VarcharValue RAW_IN = new("hello world");
+sql:InOutParameter RAW_INOUT = new("in out");
+sql:VarcharOutParameter RAW_OUT = new();
+
+sql:BlobValue LONGRAW_IN = new(mediumBlob); 
+sql:InOutParameter LONGRAW_INOUT = new(smallBlob);
+sql:BlobOutParameter LONGRAW_OUT = new();

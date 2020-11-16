@@ -87,7 +87,7 @@ function readFileAsCharacter() returns @untainted error|string {
 
 }
 
-# The `stripArray` function closes the large character file
+# The `stripArray` function closes the large blob file
 # + arr type byte[] - the byte array that needs to be stripped
 # + len type int - the length of the byte array
 # + return stripped array
@@ -103,6 +103,23 @@ function stripArray(byte[] arr, int len) returns byte[] {
 
     return strippedArray;
 }
+
+// # The `stripCharArray` function closes the large clob file
+// # + arr type string - the byte array that needs to be stripped
+// # + len type int - the length of the byte array
+// # + return stripped array
+// function stripCharArray(string arr, int len) returns string {
+//     int i = 0;
+//     string strippedArray = arr.filter(function (int value) returns boolean{
+//             if(i< len){
+//                 i+=1;
+//                 return (true);
+//             }
+//             return(false);
+//         });
+
+//     return strippedArray;
+// }
 
 
 # The `createParameterName` function that formats the parameter names
