@@ -121,6 +121,22 @@ function executeLongProcedure(jdbc:Client jdbcClient) returns error?{
     io:println("LONG Procedure Execution Started!\n");
 
     sql:ParameterizedCallQuery query = `CALL LONGPROC(  
+        ${LONG_IN}, ${LONG_INOUT}, ${LONG_OUT}
+        )`;
+
+    sql:ProcedureCallResult result = check jdbcClient->call(query);
+
+    io:println(LONG_INOUT.get(string), " ", LONG_OUT.get(string));
+    
+}
+
+
+function executeRawProcedure(jdbc:Client jdbcClient) returns error?{
+    
+    io:println("\n------------------------------------");
+    io:println("RAW Procedure Execution Started!\n");
+
+    sql:ParameterizedCallQuery query = `CALL RAWPROC(  
         ${RAW_IN}, ${RAW_INOUT}, ${RAW_OUT} ,
         ${LONGRAW_IN}, ${LONGRAW_INOUT}, ${LONGRAW_OUT}
         )`;
@@ -159,8 +175,8 @@ function executeAllProcedures(jdbc:Client jdbcClient) returns error?{
     // err = executeDatetimeProcedure(jdbcClient);
     // printExecuteProcedureResult("DATETIME", err);
 
-    // err = executeBLOBProcedure(jdbcClient);
-    // printExecuteProcedureResult("BLOB", err);
+    err = executeBLOBProcedure(jdbcClient);
+    printExecuteProcedureResult("BLOB", err);
 
     // err = executeCLOBProcedure(jdbcClient);
     // printExecuteProcedureResult("CLOB", err);
@@ -170,4 +186,7 @@ function executeAllProcedures(jdbc:Client jdbcClient) returns error?{
 
     err = executeLongProcedure(jdbcClient);
     printExecuteProcedureResult("LONG", err);
+
+    // err = executeRawProcedure(jdbcClient);
+    // printExecuteProcedureResult("RAW", err);
 }

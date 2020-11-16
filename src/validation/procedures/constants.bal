@@ -70,7 +70,7 @@ sql:TimeOutParameter INTERVALD2S_OUT = new();
 
 // -------------BLOB----------------------------
 byte[] blob=check readFileAsByte();
-byte[] mediumBlob = stripArray(blob, 1000);
+byte[] mediumBlob = stripArray(blob, 15000);
 byte[] smallBlob = stripArray(blob, 500);
 
 sql:BlobValue BLOB_IN = new(mediumBlob);
@@ -87,16 +87,22 @@ sql:ClobOutParameter CLOB_OUT = new();
 
 // -------------NCLOB----------------------------
 
-sql:ClobValue NCLOB_IN = CLOB_IN; 
+sql:NClobValue NCLOB_IN = CLOB_IN; 
 sql:InOutParameter NCLOB_INOUT = CLOB_INOUT;
-sql:ClobOutParameter NCLOB_OUT = new();
+sql:NClobOutParameter NCLOB_OUT = new();
 
 // -------------LONG----------------------------
+sql:BlobValue LONG_IN = new(mediumBlob); 
+sql:InOutParameter LONG_INOUT = new(smallBlob);
+sql:BlobOutParameter LONG_OUT = new();
 
-sql:VarcharValue RAW_IN = new("hello world");
-sql:InOutParameter RAW_INOUT = new("in out");
-sql:VarcharOutParameter RAW_OUT = new();
+// -------------RAW----------------------------
+
+sql:BlobValue RAW_IN = new(mediumBlob); 
+sql:InOutParameter RAW_INOUT = new(smallBlob);
+sql:BlobOutParameter RAW_OUT = new();
 
 sql:BlobValue LONGRAW_IN = new(mediumBlob); 
 sql:InOutParameter LONGRAW_INOUT = new(smallBlob);
 sql:BlobOutParameter LONGRAW_OUT = new();
+

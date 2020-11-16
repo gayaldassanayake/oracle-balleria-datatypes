@@ -61,7 +61,7 @@ function createLongProcedure(jdbc:Client jdbcClient) returns error?{
 function createRawProcedure(jdbc:Client jdbcClient) returns error?{
     string[] variables = ["RAW", "LONG RAW"];
 
-    string query = createProcedureQuery("LONGPROC", variables);
+    string query = createProcedureQuery("RAWPROC", variables);
 
     sql:ExecutionResult result = check jdbcClient->execute(query);
 }
@@ -102,8 +102,11 @@ function createAllProcedures(jdbc:Client jdbcClient) returns error?{
     // err = createNCLOBProcedure(jdbcClient);
     // printCreateProcedureResult("NCLOB", err);
 
-    err = createLongProcedure(jdbcClient);
-    printCreateProcedureResult("LONG", err);
+    // err = createLongProcedure(jdbcClient);
+    // printCreateProcedureResult("LONG", err);
+
+    // err = createRawProcedure(jdbcClient);
+    // printCreateProcedureResult("RAW", err);
 }
 
 
